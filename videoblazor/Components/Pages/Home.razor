@@ -1,0 +1,53 @@
+﻿@using Microsoft.JSInterop
+@page "/"
+
+<PageTitle>Home Video</PageTitle>
+
+<h1>Manera General</h1>
+<video width="640" height="360" controls @attributes="VideoAttributes">
+    Tu navegador no soporta el elemento de video.
+</video>
+<h1>Manera MemoryStream</h1>
+<video width="640" height="360" controls @attributes="MemoryStreamVideoAttributes">
+    Tu navegador no soporta el elemento de video.
+</video>
+<h1>Manera GRPC</h1>
+<video width="640" height="360" controls @attributes="MemoryStreamgrpcAttributes">
+    Tu navegador no soporta el elemento de video.
+</video>
+
+@code {
+    private Dictionary<string, object> VideoAttributes = new Dictionary<string, object>();
+    private Dictionary<string, object> MemoryStreamVideoAttributes = new Dictionary<string, object>();
+    private Dictionary<string, object> MemoryStreamgrpcAttributes = new Dictionary<string, object>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Obtener la referencia del video desde el código C#
+        string videoSrc = ObtenerSrcDelVideo();
+
+        // Asignar la referencia del video al atributo src del video normal
+        VideoAttributes["src"] = videoSrc;
+
+        // Cargar el video en un MemoryStream
+        using (var stream = new MemoryStream())
+        using (var fileStream = new FileStream("wwwroot/video/tiktok.mp4", FileMode.Open))
+        {
+            await fileStream.CopyToAsync(stream);
+            var videoBytes = stream.ToArray();
+
+            // Convertir el video en un string base64
+            var base64 = Convert.ToBase64String(videoBytes);
+            var videoBase64 = $"data:video/mp4;base64,{base64}";
+
+            // Asignar la referencia del video base64 al atributo src del video en MemoryStream
+            MemoryStreamVideoAttributes["src"] = videoBase64;
+        }
+    }
+
+    private string ObtenerSrcDelVideo()
+    {
+        // Aquí puedes tener la lógica para obtener la referencia del video, por ejemplo, de una base de datos o una API
+        return "/video/tiktok.mp4"; // Aquí puedes retornar dinámicamente la referencia del video
+    }
+}
