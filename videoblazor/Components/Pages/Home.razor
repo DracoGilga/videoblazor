@@ -1,53 +1,32 @@
 ﻿@using Microsoft.JSInterop
+@using videoblazor.Conexion
 @page "/"
 
 <PageTitle>Home Video</PageTitle>
 
-<h1>Manera General</h1>
-<video width="auto" height="360" controls @attributes="VideoAttributes">
-    Tu navegador no soporta el elemento de video.
-</video>
-<h1>Manera MemoryStream</h1>
-<video width="auto" height="360" controls @attributes="MemoryStreamVideoAttributes">
-    Tu navegador no soporta el elemento de video.
-</video>
-<h1>Manera GRPC</h1>
+ <h1>Manera GRPC</h1>
 <video width="auto" height="360" controls @attributes="MemoryStreamgrpcAttributes">
     Tu navegador no soporta el elemento de video.
 </video>
 
 @code {
-    private Dictionary<string, object> VideoAttributes = new Dictionary<string, object>();
-    private Dictionary<string, object> MemoryStreamVideoAttributes = new Dictionary<string, object>();
     private Dictionary<string, object> MemoryStreamgrpcAttributes = new Dictionary<string, object>();
 
     protected override async Task OnInitializedAsync()
     {
-        // Obtener la referencia del video desde el código C#
-        string videoSrc = ObtenerSrcDelVideo();
+        // Llamar al servicio gRPC para obtener el stream de video
+        var swStreaming = new SWStreaming();
+        var videoStream = await swStreaming.GetVideoStreamAsync("tiktok.mp4");
 
-        // Asignar la referencia del video al atributo src del video normal
-        VideoAttributes["src"] = videoSrc;
-
-        // Cargar el video en un MemoryStream
-        using (var stream = new MemoryStream())
-        using (var fileStream = new FileStream("wwwroot/video/tiktok.mp4", FileMode.Open))
+        // Guardar el stream de video temporalmente en el servidor
+        var videoFileName = $"temp_video_{DateTime.Now.Ticks}.mp4";
+        var videoPath = Path.Combine("wwwroot", "temp_videos", videoFileName);
+        using (var fileStream = new FileStream(videoPath, FileMode.Create, FileAccess.Write))
         {
-            await fileStream.CopyToAsync(stream);
-            var videoBytes = stream.ToArray();
-
-            // Convertir el video en un string base64
-            var base64 = Convert.ToBase64String(videoBytes);
-            var videoBase64 = $"data:video/mp4;base64,{base64}";
-
-            // Asignar la referencia del video base64 al atributo src del video en MemoryStream
-            MemoryStreamVideoAttributes["src"] = videoBase64;
+            await videoStream.CopyToAsync(fileStream);
         }
-    }
 
-    private string ObtenerSrcDelVideo()
-    {
-        //Referencia del video
-        return "/video/tiktok.mp4"; 
+        // Establecer la referencia del video temporal al atributo src del video en MemoryStream
+        MemoryStreamgrpcAttributes["src"] = $"/temp_videos/{videoFileName}";
     }
 }

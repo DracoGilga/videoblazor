@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\temp_videos\**" />
+    <Content Remove="wwwroot\temp_videos\**" />
+    <EmbeddedResource Remove="wwwroot\temp_videos\**" />
+    <None Remove="wwwroot\temp_videos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="Protos\mediaSpiderWatcher.proto" GrpcServices="Client" />
   </ItemGroup>
 
