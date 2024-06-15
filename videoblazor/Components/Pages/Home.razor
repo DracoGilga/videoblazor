@@ -16,7 +16,7 @@
     {
         // Llamar al servicio gRPC para obtener el stream de video
         var swStreaming = new SWStreaming();
-        var videoStream = await swStreaming.GetVideoStreamAsync("tiktok.mp4");
+        var videoStream = await swStreaming.GetVideoStreamAsync("ElClub.mp4");
 
         // Guardar el stream de video temporalmente en el servidor
         var videoFileName = $"temp_video_{DateTime.Now.Ticks}.mp4";

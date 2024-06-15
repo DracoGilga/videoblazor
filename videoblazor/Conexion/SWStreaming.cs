@@ -13,7 +13,7 @@ namespace videoblazor.Conexion
         public SWStreaming()
         {
             // url del canal grpc
-            var channel = GrpcChannel.ForAddress("https://puer.azurewebsites.net"); 
+            var channel = GrpcChannel.ForAddress("https://grcpsw.azurewebsites.net"); 
             _client = new VideoServiceClient(channel);
         }
 
